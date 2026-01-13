@@ -1,0 +1,3 @@
+/home/adolfiscariot/dretsim/build/CMakeFiles/dretsim.dir
+/home/adolfiscariot/dretsim/build/CMakeFiles/edit_cache.dir
+/home/adolfiscariot/dretsim/build/CMakeFiles/rebuild_cache.dir
