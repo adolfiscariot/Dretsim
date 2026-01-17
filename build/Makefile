@@ -117,6 +117,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named glad
+
+# Build rule for target.
+glad: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 glad
+.PHONY : glad
+
+# fast build rule for target.
+glad/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/build
+.PHONY : glad/fast
+
+#=============================================================================
 # Target rules for targets named dretsim
 
 # Build rule for target.
@@ -128,6 +141,30 @@ dretsim: cmake_check_build_system
 dretsim/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/dretsim.dir/build.make CMakeFiles/dretsim.dir/build
 .PHONY : dretsim/fast
+
+external/src/glad.o: external/src/glad.c.o
+.PHONY : external/src/glad.o
+
+# target to build an object file
+external/src/glad.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/external/src/glad.c.o
+.PHONY : external/src/glad.c.o
+
+external/src/glad.i: external/src/glad.c.i
+.PHONY : external/src/glad.i
+
+# target to preprocess a source file
+external/src/glad.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/external/src/glad.c.i
+.PHONY : external/src/glad.c.i
+
+external/src/glad.s: external/src/glad.c.s
+.PHONY : external/src/glad.s
+
+# target to generate assembly for a file
+external/src/glad.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/glad.dir/build.make CMakeFiles/glad.dir/external/src/glad.c.s
+.PHONY : external/src/glad.c.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -162,6 +199,10 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... dretsim"
+	@echo "... glad"
+	@echo "... external/src/glad.o"
+	@echo "... external/src/glad.i"
+	@echo "... external/src/glad.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

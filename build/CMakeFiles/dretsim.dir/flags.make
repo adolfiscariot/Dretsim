@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = 
+CXX_INCLUDES = -I/home/adolfiscariot/dretsim/external/include
 
-CXX_FLAGS = -O2 -g -fno-omit-frame-pointer -march=native
+CXX_FLAGS = -O2 -g -fno-omit-frame-pointer -march=native -std=gnu++17
 
