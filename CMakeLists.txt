@@ -16,7 +16,7 @@ find_package(glfw3 REQUIRED)
 
 # Create GLAD library
 add_library(glad external/src/glad.c)
-target_include_directories(glad PUBLIC external/include)
+target_include_directories(glad PUBLIC external/glad)
 
 # Create executable
 add_executable(dretsim src/main.cpp)
