@@ -13,6 +13,13 @@ void processInput(GLFWwindow *window){
 	}
 }
 
+const char *vertexShaderSource = "#version 330 core\n"
+	"layout (location = 0) in vec3 aPos;\n"
+	"void main()\n"
+	"{\n"
+		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+	"}\0";
+	
 int main(){
 	// Initalize glfw library
 	glfwInit();
@@ -56,6 +63,57 @@ int main(){
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	/*
+	 * ===========================================================
+	 * VERTEX SHADER
+	 * ===========================================================
+	 */
+	
+	// Triangle co-ordinates
+	float vertices[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f
+	};
+
+	// Create a vertex buffer object and give it an ID
+	unsigned int VBO;
+	glGenBuffers(1, &VBO);
+
+	// Bind created buffer to type of vertex buffer
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	//Copy user data into buffer's memory
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+
+	// Create a vertex shader object
+	unsigned int vertexShader;
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
+	// Compile the source code for the vertex shader
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glCompileShader(vertexShader);
+
+	// Test the compilation's success
+	int success;
+	char infoLog[512];
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	if(!success){
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog;
+	} else {
+		std::cout << "WE GOOD BABY!!!\n";
+	}
+
+	/*
+	 * ===========================================================
+	 * FRAGMENT SHADER
+	 * ===========================================================
+	 */
+
+
 
 	glfwTerminate();
 	return 0;
