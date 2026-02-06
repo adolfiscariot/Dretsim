@@ -19,7 +19,11 @@ add_library(glad external/src/glad.c)
 target_include_directories(glad PUBLIC external/glad)
 
 # Create executable
-add_executable(dretsim src/main.cpp)
+add_executable(
+	dretsim 
+		src/main.cpp
+		src/stb_image.cpp
+	)
 
 # Link libraries
 target_link_libraries(dretsim OpenGL::GL glfw glad)

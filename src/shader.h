@@ -59,7 +59,6 @@ class Shader {
 			glShaderSource(vertex, 1, &vShaderCode, NULL);
 			glCompileShader(vertex);
 
-			// print compiler errors if any
 			glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 			if (!success){
 				glGetShaderInfoLog(vertex, 512, NULL, infoLog);
@@ -71,7 +70,6 @@ class Shader {
 			glShaderSource(fragment, 1, &fShaderCode, NULL);
 			glCompileShader(fragment);
 
-			// print compiler errors if any
 			glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 			if (!success){
 				glGetShaderInfoLog(fragment, 512, NULL, infoLog);
