@@ -5,6 +5,20 @@
 #include "../include/stb_image.h"
 #include <vector>
 
+const int PARTICLE_COUNT = 1000;
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
+
+
+
+struct Particle{
+	float x, y;    // Position
+	float vx, vy;  // Velocity 
+};
+
+// List of particles of type Particle
+std::vector<Particle> particles(PARTICLE_COUNT);
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 	glViewport(0, 0, width, height);
 }
@@ -16,14 +30,22 @@ void processInput(GLFWwindow *window){
 	}
 }
 
-const int PARTICLE_COUNT = 1000;
+// Update particle position
+void update_particles(std::vector<Particle> &particles, float dt){
 
-struct Particle{
-	float x;
-	float y;
-};
+	for (Particle &p: particles){
+		p.x += p.vx * dt;
+		p.y += p.vy * dt;
 
-std::vector<Particle> particles(PARTICLE_COUNT);
+		// X bounce
+		if (p.x >= 1.0 && p.vx > 0.0f){p.x = 1.0f; p.vx = -p.vx;}
+		if (p.x <= -1.0 && p.vy < 0.0f){p.x = -1.0f; p.vx = -p.vx;}
+
+		// Y bounce
+		if (p.y >= 1.0 && p.vy > 0.0f){p.y = 1.0f; p.vy = -p.vy;}
+		if (p.y <= -1.0 && p.vy < 0.0f){p.y = -1.0f; p.vy = -p.vy;}
+	}
+}
 
 int main(){
 	// Initalize glfw library
@@ -35,7 +57,7 @@ int main(){
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Create an opengl window and context
-	GLFWwindow* window = glfwCreateWindow(800, 600, "DRETSIM", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "DRETSIM", NULL, NULL);
 	if (window == NULL){
 		std::cout << "Failed to create GLFW window";
 		glfwTerminate();
@@ -57,10 +79,14 @@ int main(){
 
 	// Set coordinates for particles
 	for (int i = 0; i < particles.size(); i++){
-		//particles[i].x = -0.9f + i * 0.0018f;
-		//particles[i].y = 0.0f;
-		particles[i].x = -1.0f + 2.0f * (rand() / (float)RAND_MAX); // -1 to 1
-	    particles[i].y = -1.0f + 2.0f * (rand() / (float)RAND_MAX); // -1 to 1k
+		particles[i].x = -1.0f + 2.0f * (rand() / (float)RAND_MAX); 
+		particles[i].y = -1.0f + 2.0f * (rand() / (float)RAND_MAX); 
+		
+		float rx = -1.0f + 2.0f * (rand() / (float)RAND_MAX); 
+		float ry = -1.0f + 2.0f * (rand() / (float)RAND_MAX); 
+
+		particles[i].vx = rx * 1.0;
+		particles[i].vy = ry * 1.0f;
 	}
 
 	/*
@@ -69,31 +95,34 @@ int main(){
 	 * ===========================================================
 	 */
 
-	unsigned int VBO, VAO;
+	unsigned int VAO, VBO;
 
-	// Create VAO and VBO, giving each an index
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, particles.size() * sizeof(Particle), particles.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, particles.size() * sizeof(Particle), particles.data(), GL_DYNAMIC_DRAW);
 
-	// Configure our vertex attribute pointers
-	// position attribute
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Particle), (void *) 0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Particle), (void *)0);
 	glEnableVertexAttribArray(0);
-	
-	// Keep rendering until explicitly told to stop
-	while (!glfwWindowShouldClose(window)){
 
-		// input
+	double lastTime = glfwGetTime();
+
+	while(!glfwWindowShouldClose(window)){
+		double currentTime = glfwGetTime();
+		float dt = (float)(currentTime - lastTime);
+		lastTime = currentTime;
+
 		processInput(window);
+
+		update_particles(particles, dt);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, particles.size() * sizeof(Particle), particles.data());
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Render the container
 		ourShader.use();
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_POINTS, 0, particles.size());
@@ -106,3 +135,5 @@ int main(){
 	glfwTerminate();
 	return 0;
 }
+
+
