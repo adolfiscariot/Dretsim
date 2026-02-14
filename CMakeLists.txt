@@ -22,7 +22,6 @@ target_include_directories(glad PUBLIC external/glad)
 add_executable(
 	dretsim 
 		src/main.cpp
-		src/stb_image.cpp
 	)
 
 # Link libraries

@@ -4,20 +4,12 @@
 #include "shader.h"
 #include "../include/stb_image.h"
 #include <vector>
+#include <random>
+#include "simulation.cpp"
 
 const int PARTICLE_COUNT = 1000;
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
-
-
-
-struct Particle{
-	float x, y;    // Position
-	float vx, vy;  // Velocity 
-};
-
-// List of particles of type Particle
-std::vector<Particle> particles(PARTICLE_COUNT);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 	glViewport(0, 0, width, height);
@@ -30,24 +22,8 @@ void processInput(GLFWwindow *window){
 	}
 }
 
-// Update particle position
-void update_particles(std::vector<Particle> &particles, float dt){
-
-	for (Particle &p: particles){
-		p.x += p.vx * dt;
-		p.y += p.vy * dt;
-
-		// X bounce
-		if (p.x >= 1.0 && p.vx > 0.0f){p.x = 1.0f; p.vx = -p.vx;}
-		if (p.x <= -1.0 && p.vy < 0.0f){p.x = -1.0f; p.vx = -p.vx;}
-
-		// Y bounce
-		if (p.y >= 1.0 && p.vy > 0.0f){p.y = 1.0f; p.vy = -p.vy;}
-		if (p.y <= -1.0 && p.vy < 0.0f){p.y = -1.0f; p.vy = -p.vy;}
-	}
-}
-
 int main(){
+
 	// Initalize glfw library
 	glfwInit();
 
@@ -77,17 +53,11 @@ int main(){
 	// Build and compile our shader program
 	Shader ourShader("../src/vertex.glsl", "../src/fragment.glsl");
 
-	// Set coordinates for particles
-	for (int i = 0; i < particles.size(); i++){
-		particles[i].x = -1.0f + 2.0f * (rand() / (float)RAND_MAX); 
-		particles[i].y = -1.0f + 2.0f * (rand() / (float)RAND_MAX); 
-		
-		float rx = -1.0f + 2.0f * (rand() / (float)RAND_MAX); 
-		float ry = -1.0f + 2.0f * (rand() / (float)RAND_MAX); 
-
-		particles[i].vx = rx * 1.0;
-		particles[i].vy = ry * 1.0f;
-	}
+	Simulation sim(PARTICLE_COUNT);
+	const std::vector<Particle> &particles = sim.get_particles();
+	size_t particleSize = sim.get_particle_size();
+	size_t particlesCount = sim.get_particles_count();
+	const Particle *particlesData = sim.get_particles_data();
 
 	/*
 	 * ===========================================================
@@ -102,9 +72,9 @@ int main(){
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, particles.size() * sizeof(Particle), particles.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, particlesCount * particleSize, particlesData, GL_DYNAMIC_DRAW);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Particle), (void *)0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, particleSize, (void *)0);
 	glEnableVertexAttribArray(0);
 
 	double lastTime = glfwGetTime();
@@ -116,16 +86,18 @@ int main(){
 
 		processInput(window);
 
-		update_particles(particles, dt);
+		sim.update_particles(dt);
+		const Particle *particlesData = sim.get_particles_data();
+
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, particles.size() * sizeof(Particle), particles.data());
+		glBufferSubData(GL_ARRAY_BUFFER, 0, particlesCount * particleSize, particlesData);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		ourShader.use();
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_POINTS, 0, particles.size());
+		glDrawArrays(GL_POINTS, 0, particlesCount);
 
 		// check for and call events and swap the buffers
 		glfwSwapBuffers(window);
