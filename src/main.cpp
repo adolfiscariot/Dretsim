@@ -10,6 +10,7 @@
 const int PARTICLE_COUNT = 1000;
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
+const double FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 	glViewport(0, 0, width, height);
@@ -77,16 +78,23 @@ int main(){
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, particleSize, (void *)0);
 	glEnableVertexAttribArray(0);
 
+	double accumulator = 0.0f;
 	double lastTime = glfwGetTime();
 
 	while(!glfwWindowShouldClose(window)){
+		// Simulation should happen 60 times per second regardless of the machine's frame rate
 		double currentTime = glfwGetTime();
-		float dt = (float)(currentTime - lastTime);
+		double frameTime = currentTime - lastTime;
 		lastTime = currentTime;
+
+		accumulator += frameTime;
 
 		processInput(window);
 
-		sim.update_particles(dt);
+		while (accumulator >= FIXED_DT){
+			sim.update_particles(FIXED_DT);
+			accumulator -= FIXED_DT;
+		}
 		const Particle *particlesData = sim.get_particles_data();
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
