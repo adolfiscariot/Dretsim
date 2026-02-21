@@ -7,7 +7,7 @@
 #include <random>
 #include "simulation.cpp"
 
-const int PARTICLE_COUNT = 1000;
+const int PARTICLE_COUNT = 10000;
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const double FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
