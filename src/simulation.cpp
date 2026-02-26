@@ -2,6 +2,8 @@
 #include <vector>
 #include <random>
 
+
+
 struct Particle{
 	float x, y;
 	float vx, vy;
@@ -17,9 +19,14 @@ class Simulation{
 		// update particles position
 		void update_particles(float dt){
 			for (Particle &p : particles){
-				p.x += p.vx * dt;
-				p.y += p.vy * dt;
+				// 1. Apply gravity
+				p.vy += -GRAVITY *dt;
 
+				// 2. Update position
+				p.x += p.vx * dt;
+				p.y += p.vy  * dt;
+
+				// 3. Bounce off walls
 				if (p.x >= 1.0f && p.vx > 0.0f){
 					p.x = 1.0f;
 					p.vx = -p.vx;
@@ -58,6 +65,8 @@ class Simulation{
 		}
 
 	private:
+		const float GRAVITY = 0.1f;
+
 		// set particles start point coordinates
 		void set_coordinates(){
 			for (Particle &p : particles){
