@@ -12,15 +12,21 @@ struct Particle{
 class Simulation{
 
 	public:
-		Simulation(int count): particles(count), gen(ran_dev()), dist(-1.0f, 1.0f){
+		Simulation(int count): 
+			particles(count), 
+			gen(ran_dev()), 
+			dist(-1.0f, 1.0f), 
+			wind_noise(-0.01f, 0.01f)
+		{
 			set_coordinates();
 		}
 
 		// update particles position
 		void update_particles(float dt){
 			for (Particle &p : particles){
-				// 1. Apply gravity
-				p.vy += -GRAVITY *dt;
+				// 1. Apply gravity, wind
+				p.vx += (WIND_X + wind_noise(gen)) * dt;
+				p.vy += -GRAVITY + (WIND_Y + wind_noise(gen)) * dt;
 
 				// 2. Update position
 				p.x += p.vx * dt;
@@ -82,4 +88,9 @@ class Simulation{
 		std::random_device ran_dev;
 		std::mt19937 gen;
 		std::uniform_real_distribution<float> dist;
+
+		// Wind settings
+		const float WIND_X = 0.05f;
+		const float WIND_Y = 0.0;
+		std::uniform_real_distribution<float> wind_noise;
 };
