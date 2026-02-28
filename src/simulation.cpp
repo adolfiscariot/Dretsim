@@ -70,7 +70,6 @@ class Simulation{
 				}
 			}
 
-
 			// 3. Update position
 			for (Particle &p : particles){
 				p.x += p.vx * dt;
@@ -115,7 +114,6 @@ class Simulation{
 		}
 
 	private:
-		const float GRAVITY = 0.1f;
 
 		// set particles start point coordinates
 		void set_coordinates(){
@@ -133,6 +131,9 @@ class Simulation{
 		std::random_device ran_dev;
 		std::mt19937 gen;
 		std::uniform_real_distribution<float> dist;
+
+		// Gravity settings
+		const float GRAVITY = 0.1f;
 
 		// Wind settings
 		const float WIND_X = 0.05f;
