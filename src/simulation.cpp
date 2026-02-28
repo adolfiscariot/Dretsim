@@ -21,7 +21,13 @@ class Simulation{
 
 		// update particles position
 		void update_particles(float dt){
-			// 1. Apply forces
+
+			/*
+			 * ======================================
+			 * 1. APPLY FORCES TO VELOCITY
+			 * ======================================
+			 */
+
 			for (Particle &p : particles){
 				// Gravity
 				p.vy += -GRAVITY * dt; 
@@ -43,18 +49,21 @@ class Simulation{
 				p.vy += dy * PULL_MULTIPLIER * dt;
 			}
 
-			// 2. Attraction and replusion
+			/*
+			 * ======================================
+			 * 2. INTER-PARTICLE ATTRACTION
+			 * ======================================
+			 */
 
 			/*
 			 * O(n^2) loop as each particle measures it's distance from all other
 			 * particles. The square of this distance is used to find the force
-			 * to be applied (attraction/repulsion) via the inverse-square law.
-			 * This force is applied to both parties as per Newton's 3rd law: each
-			 * force begets an equal and opposite force
+			 * to be applied.This force is applied to both parties as per Newton's
+			 * 3rd law: each force begets an equal and opposite force.
 			 */
 
-			for (int i = 0; i < particles.size(); i++){
-				for (int j = i + 1; j < particles.size(); j++){
+			for (size_t i = 0; i < particles.size(); i++){
+				for (size_t j = i + 1; j < particles.size(); j++){
 					float dist_x = particles[j].x - particles[i].x;
 					float dist_y = particles[j].y - particles[i].y;
 
@@ -70,7 +79,12 @@ class Simulation{
 				}
 			}
 
-			// 3. Update position
+			/*
+			 * ======================================
+			 * 3. UPDATE PARTICLE POSITION
+			 * ======================================
+			 */
+
 			for (Particle &p : particles){
 				p.x += p.vx * dt;
 				p.y += p.vy  * dt;
