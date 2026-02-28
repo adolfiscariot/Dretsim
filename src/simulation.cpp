@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <cmath>
 
 struct Particle{
 	float x, y;
@@ -41,8 +42,8 @@ class Simulation{
 				float dy = 0.0f - p.y;
 
 				/* 
-				 * Pull multiplier ensures the wind gets stronger as distances 
-				 * are smaller
+				 * Pull multiplier ensures the force gets stronger as distances 
+				 * get smaller
 				 */
 
 				p.vx += dx * PULL_MULTIPLIER * dt;
@@ -58,8 +59,9 @@ class Simulation{
 			/*
 			 * O(n^2) loop as each particle measures it's distance from all other
 			 * particles. The square of this distance is used to find the force
-			 * to be applied.This force is applied to both parties as per Newton's
-			 * 3rd law: each force begets an equal and opposite force.
+			 * to be applied via inverse-square law.This force is applied to both 
+			 * particles as per Newton's 3rd law: each force begets an equal and 
+			 * opposite force. Attraction & Repulsion are both implemented.
 			 */
 
 			for (size_t i = 0; i < particles.size(); i++){
@@ -69,12 +71,22 @@ class Simulation{
 
 					float dist_sqr = (dist_x * dist_x) + (dist_y * dist_y);
 					if (dist_sqr > 0.0001f){ // avoid division by 0
-						float force = STRENGTH / dist_sqr;
+						float dist = sqrt(dist_sqr);
 
-						particles[i].vx += dist_x * force * dt;
-						particles[i].vy += dist_y * force * dt;
-						particles[j].vx -= dist_x * force * dt;
-						particles[j].vy -= dist_y * force * dt;
+						float force;
+						if (dist_sqr < DIST_LIMIT){
+							force = REP_STRENGTH / dist_sqr;
+						} else{
+							force = ATTR_STRENGTH / dist_sqr;
+						}
+
+						float fx = (dist_x / dist) * force;
+						float fy = (dist_y / dist) * force;
+
+						particles[i].vx += fx  * dt;
+						particles[i].vy += fy  * dt;
+						particles[j].vx -= fx  * dt;
+						particles[j].vy -= fy  * dt;
 					}
 				}
 			}
@@ -135,8 +147,8 @@ class Simulation{
 				p.x = dist(gen);
 				p.y = dist(gen);
 
-				p.vx = 0.5f;
-				p.vy = 0.5f;
+				p.vx = dist(gen);
+				p.vy = dist(gen);
 			}
 		}
 
@@ -158,5 +170,7 @@ class Simulation{
 		const float PULL_MULTIPLIER = 0.001f;
 
 		// Attraction & Repulsion settings
-		const float STRENGTH = 0.0001f;
+		const float ATTR_STRENGTH = 0.0001f;
+		const float REP_STRENGTH = -0.001f;
+		const float DIST_LIMIT = 0.05f;
 };
