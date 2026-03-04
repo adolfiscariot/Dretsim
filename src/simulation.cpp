@@ -74,7 +74,7 @@ class Simulation{
 						float dist = sqrt(dist_sqr);
 
 						float force;
-						if (dist_sqr < DIST_LIMIT){
+						if (dist_sqr < 0.05f){
 							force = REP_STRENGTH / dist_sqr;
 						} else{
 							force = ATTR_STRENGTH / dist_sqr;
@@ -169,8 +169,7 @@ class Simulation{
 		// Attract to center settings
 		const float PULL_MULTIPLIER = 0.001f;
 
-		// Attraction & Repulsion settings
+		// Attraction & Repulsion settings. Close particles = strong repulsion & vice-versa.
 		const float ATTR_STRENGTH = 0.0001f;
 		const float REP_STRENGTH = -0.001f;
-		const float DIST_LIMIT = 0.05f;
 };
