@@ -4,8 +4,9 @@
 #include <cmath>
 
 struct Particle{
-	float x, y;
-	float vx, vy;
+	float x, y;     // Position
+	float vx, vy;   // Velocity 
+	float r, g, b;  // Color
 };
 
 class Simulation{
@@ -14,10 +15,12 @@ class Simulation{
 		Simulation(int count): 
 			particles(count), 
 			gen(ran_dev()), 
-			dist(-1.0f, 1.0f), 
-			wind_noise(-0.01f, 0.01f)
+			dist(-0.5f, 0.5f), 
+			wind_noise(-0.01f, 0.01f),
+			rand_colour(0.0f, 1.0f)
 		{
 			set_coordinates();
+			set_colours();
 		}
 
 		// update particles position
@@ -101,7 +104,7 @@ class Simulation{
 				p.x += p.vx * dt;
 				p.y += p.vy  * dt;
 
-				// 3. Bounce off walls
+				// Bounce off walls
 				if (p.x >= 1.0f && p.vx > 0.0f){
 					p.x = 1.0f;
 					p.vx = -p.vx;
@@ -118,6 +121,18 @@ class Simulation{
 					p.y = -1.0f;
 					p.vy = -p.vy;
 				}
+			}
+
+			/*
+			 * ======================================
+			 * 4. UPDATE PARTICLE COLOUR
+			 * ======================================
+			 */
+			
+			for (Particle &p : particles){
+				p.r = rand_colour(gen);
+				p.g = rand_colour(gen);
+				p.b = rand_colour(gen);
 			}
 		}
 
@@ -144,11 +159,21 @@ class Simulation{
 		// set particles start point coordinates
 		void set_coordinates(){
 			for (Particle &p : particles){
-				p.x = dist(gen);
-				p.y = dist(gen);
+				p.x = 0.0f;
+				p.y = 0.0f;
 
-				p.vx = dist(gen);
-				p.vy = dist(gen);
+				p.vx = 0.0f;
+				p.vy = 0.0f;
+			}
+		}
+
+		void set_colours(){
+			for (Particle &p : particles){
+				// All white
+
+				p.r = 1.0f;
+				p.g = 1.0f;
+				p.b = 1.0f;
 			}
 		}
 
@@ -157,6 +182,9 @@ class Simulation{
 		std::random_device ran_dev;
 		std::mt19937 gen;
 		std::uniform_real_distribution<float> dist;
+
+		// Colour settings
+		std::uniform_real_distribution<float> rand_colour;
 
 		// Gravity settings
 		const float GRAVITY = 0.1f;

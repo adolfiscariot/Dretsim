@@ -78,8 +78,13 @@ int main(){
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, particlesCount * particleSize, particlesData, GL_DYNAMIC_DRAW);
 
+	// Position Attributes
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, particleSize, (void *)0);
 	glEnableVertexAttribArray(0);
+
+	// Color Attributes
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, particleSize, (void *) (4 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	double accumulator = 0.0f; // Timer for updating particles based on frame time
 	double lastTime = glfwGetTime();
