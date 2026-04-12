@@ -38,7 +38,7 @@ int main(){
 	// Create an opengl window and context
 	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "DRETSIM", NULL, NULL);
 	if (window == NULL){
-		std::cout << "Failed to create GLFW window";
+		std::cout << "Failed to create GLFW window\n";
 		glfwTerminate();
 		return -1;
 	}

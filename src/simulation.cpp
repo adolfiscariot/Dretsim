@@ -3,12 +3,6 @@
 #include <random>
 #include <cmath>
 
-struct Particle{
-	float x, y;     // Position
-	float vx, vy;   // Velocity 
-	float r, g, b;  // Color
-};
-
 class Simulation{
 
 	public:
@@ -32,25 +26,25 @@ class Simulation{
 			 * ======================================
 			 */
 
-			for (Particle &p : particles){
+			for (int i = 0; i < count; i++){
 				// Gravity
-				p.vy += -GRAVITY * dt; 
+				vy[i] += -GRAVITY * dt; 
 
 				// Wind 
-				p.vx += (WIND_X + wind_noise(gen)) * dt;
-				p.vy += (WIND_Y + wind_noise(gen)) * dt;
+				vx[i] += (WIND_X + wind_noise(gen)) * dt;
+				vy[i] += (WIND_Y + wind_noise(gen)) * dt;
 
 				// Attract to center
-				float dx = 0.0f - p.x;
-				float dy = 0.0f - p.y;
+				float dx = 0.0f - x[i];
+				float dy = 0.0f - y[i];
 
 				/* 
 				 * Pull multiplier ensures the force gets stronger as distances 
 				 * get smaller
 				 */
 
-				p.vx += dx * PULL_MULTIPLIER * dt;
-				p.vy += dy * PULL_MULTIPLIER * dt;
+				vx[i] += dx * PULL_MULTIPLIER * dt;
+				vy[i] += dy * PULL_MULTIPLIER * dt;
 			}
 
 			/*
@@ -67,10 +61,10 @@ class Simulation{
 			 * opposite force. Attraction & Repulsion are both implemented.
 			 */
 
-			for (size_t i = 0; i < particles.size(); i++){
-				for (size_t j = i + 1; j < particles.size(); j++){
-					float dist_x = particles[j].x - particles[i].x;
-					float dist_y = particles[j].y - particles[i].y;
+			for (size_t i = 0; i < count); i++){
+				for (size_t j = i + 1; j < count; j++){
+					float dist_x = x[j] - x[i];
+					float dist_y = y[j] - y[i];
 
 					float dist_sqr = (dist_x * dist_x) + (dist_y * dist_y);
 					if (dist_sqr > 0.0001f){ // avoid division by 0
@@ -86,10 +80,10 @@ class Simulation{
 						float fx = (dist_x / dist) * force;
 						float fy = (dist_y / dist) * force;
 
-						particles[i].vx += fx  * dt;
-						particles[i].vy += fy  * dt;
-						particles[j].vx -= fx  * dt;
-						particles[j].vy -= fy  * dt;
+						vx[i] += fx  * dt;
+						vy[i] += fy  * dt;
+						vx[j] -= fx  * dt;
+						vy[j] -= fy  * dt;
 					}
 				}
 			}
@@ -100,26 +94,26 @@ class Simulation{
 			 * ======================================
 			 */
 
-			for (Particle &p : particles){
-				p.x += p.vx * dt;
-				p.y += p.vy  * dt;
+			for (int i = 0; i < count; i++){
+				x[i] += vx[i] * dt;
+				y[i] += vy[i]  * dt;
 
 				// Bounce off walls
-				if (p.x >= 1.0f && p.vx > 0.0f){
-					p.x = 1.0f;
-					p.vx = -p.vx;
+				if (x[i] >= 1.0f && vx[i] > 0.0f){
+					x[i] = 1.0f;
+					vx[i] = -vx[i];
 				}
-				if (p.x <= -1.0f && p.vx < 0.0f){
-					p.x = -1.0f;
-					p.vx = -p.vx;
+				if (x[i] <= -1.0f && vx[i] < 0.0f){
+					x[i] = -1.0f;
+					vx[i] = -vx[i];
 				}
-				if (p.y >= 1.0f && p.vy > 0.0f){
-					p.y = 1.0f;
-					p.vy = -p.vy;
+				if (y[i] >= 1.0f && vy[i] > 0.0f){
+					y[i] = 1.0f;
+					vy[i] = -vy[i];
 				}
-				if (p.y <= -1.0f && p.vy < 0.0f){
-					p.y = -1.0f;
-					p.vy = -p.vy;
+				if (y[i] <= -1.0f && vy[i] < 0.0f){
+					y[i] = -1.0f;
+					vy[i] = -vy[i];
 				}
 			}
 
@@ -129,10 +123,10 @@ class Simulation{
 			 * ======================================
 			 */
 			
-			for (Particle &p : particles){
-				p.r = rand_colour(gen);
-				p.g = rand_colour(gen);
-				p.b = rand_colour(gen);
+			for (int i = 0; i < count; i++){
+				r[i] = rand_colour(gen);
+				g[i] = rand_colour(gen);
+				b[i] = rand_colour(gen);
 			}
 		}
 
@@ -156,24 +150,28 @@ class Simulation{
 
 	private:
 
+		std::vector<float> x, y, z;
+		std::vector<float> vx, vy;
+		std::vector<float> r, g, b;	
+
 		// set particles start point coordinates
 		void set_coordinates(){
-			for (Particle &p : particles){
-				p.x = 0.0f;
-				p.y = 0.0f;
+			for (int i = 0; i < count; i++){
+				x[i] = 0.0f;
+				y[i] = 0.0f;
 
-				p.vx = 0.0f;
-				p.vy = 0.0f;
+				vx[i] = 0.0f;
+				vy[i] = 0.0f;
 			}
 		}
 
 		void set_colours(){
-			for (Particle &p : particles){
+			for (int i = 0; i < count; i++){
 				// All white
 
-				p.r = 1.0f;
-				p.g = 1.0f;
-				p.b = 1.0f;
+				r[i] = 1.0f;
+				g[i] = 1.0f;
+				b[i] = 1.0f;
 			}
 		}
 
