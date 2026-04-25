@@ -168,6 +168,7 @@ class Simulation{
 
 		// Num of particles in gpu_buffer vector
 		const size_t get_particles_count() const{
+			std::cout << gpu_buffer.size() / 5;
 			return gpu_buffer.size() / 5;
 		}
 
