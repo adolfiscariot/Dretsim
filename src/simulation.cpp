@@ -7,6 +7,7 @@ class Simulation{
 
 	public:
 		Simulation(int count): 
+			count(count),
 			particles(count), 
 			gen(ran_dev()), 
 			dist(-0.5f, 0.5f), 
@@ -61,7 +62,7 @@ class Simulation{
 			 * opposite force. Attraction & Repulsion are both implemented.
 			 */
 
-			for (size_t i = 0; i < count); i++){
+			for (size_t i = 0; i < count; i++){
 				for (size_t j = i + 1; j < count; j++){
 					float dist_x = x[j] - x[i];
 					float dist_y = y[j] - y[i];
@@ -149,6 +150,7 @@ class Simulation{
 		}
 
 	private:
+		int count;
 
 		std::vector<float> x, y, z;
 		std::vector<float> vx, vy;

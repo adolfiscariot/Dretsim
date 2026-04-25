@@ -119,7 +119,6 @@ int main(){
 		// check for and call events and swap the buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		}
 	}
 
 	glfwTerminate();
