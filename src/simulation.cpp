@@ -5,14 +5,15 @@
 
 class Simulation{
 
+
+
 	public:
 		Simulation(int count): 
 			count(count),
-			particles(count), 
-			gen(ran_dev()), 
-			dist(-0.5f, 0.5f), 
 			wind_noise(-0.01f, 0.01f),
-			rand_colour(0.0f, 1.0f)
+			rand_colour(0.0f, 1.0f),
+			std::vector<float> gpu_buffer
+
 		{
 			set_coordinates();
 			set_colours();
@@ -131,28 +132,46 @@ class Simulation{
 			}
 		}
 
-		const std::vector<Particle> &get_particles() const{
-			return particles;
+
+		/*
+		* Re-package the position and color vectors
+		* for the GPU's VBO
+		*/	
+		void gpu_buffer_init(){
+			gpu_buffer.resize(count * 5);
 		}
 
-		// Size of a Particle
+		for (int i = 0; i < count; i++){
+			gpu_buffer[i*5 + 0] = x[i];
+			gpu_buffer[i*5 + 1] = y[i];
+			gpu_buffer[i*5 + 2] = r[i];
+			gpu_buffer[i*5 + 3] = g[i];
+			gpu_buffer[i*5 + 4] = b[i];
+		}
+
+
+		const std::vector<float> &get_particles() const{
+			return gpu_buffer;
+		}
+
+		// Size of a Particle(x, y, r, g, b)
 		const size_t get_particle_size() const{
-			return sizeof(Particle);
+			return sizeof(float) * 5;
 		}
 
-		// Size of particles vector
+		// Size of gpu_buffer vector
 		const size_t get_particles_count() const{
-			return particles.size();
+			return gpu_buffer.size();
 		}
 
-		const Particle *get_particles_data() const{
-			return particles.data();
+		const float  *get_particles_data() const{
+			return gpu_buffer.data();
 		}
 
 	private:
 		int count;
 
-		std::vector<float> x, y, z;
+		std::vector<float> x, y;
 		std::vector<float> vx, vy;
 		std::vector<float> r, g, b;	
 
@@ -176,12 +195,6 @@ class Simulation{
 				b[i] = 1.0f;
 			}
 		}
-
-		// Particle list settings
-		std::vector<Particle> particles;
-		std::random_device ran_dev;
-		std::mt19937 gen;
-		std::uniform_real_distribution<float> dist;
 
 		// Colour settings
 		std::uniform_real_distribution<float> rand_colour;
