@@ -24,6 +24,8 @@ class Simulation{
 
 			set_coordinates();
 			set_colours();
+
+			gpu_buffer_init();
 		}
 
 		// update particles position
