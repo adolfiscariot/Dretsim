@@ -58,10 +58,10 @@ int main(){
 	Shader ourShader("../src/vertex.glsl", "../src/fragment.glsl");
 
 	Simulation sim(PARTICLE_COUNT);
-	const std::vector<Particle> &particles = sim.get_particles();
+	const std::vector<float> &particles = sim.get_particles();
 	size_t particleSize = sim.get_particle_size();
 	size_t particlesCount = sim.get_particles_count();
-	const Particle *particlesData = sim.get_particles_data();
+	const float *particlesData = sim.get_particles_data();
 
 	/*
 	 * ===========================================================
@@ -103,7 +103,7 @@ int main(){
 			accumulator -= FIXED_DT;
 		}
 
-		const Particle *particlesData = sim.get_particles_data();
+		const float *particlesData = sim.get_particles_data();
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, particlesCount * particleSize, particlesData);
