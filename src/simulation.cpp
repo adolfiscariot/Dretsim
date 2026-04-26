@@ -6,9 +6,7 @@
 class Simulation{
 
 	public:
-		std::vector<float> gpu_buffer;
-
-		Simulation(int count): 
+		Simulation(size_t count): 
 			count(count),
 			gen(ran_dev()),
 			wind_noise(-0.01f, 0.01f),
@@ -25,7 +23,7 @@ class Simulation{
 			set_coordinates();
 			set_colours();
 
-			gpu_buffer_init();
+			pack_gpu_buffer();
 		}
 
 		// update particles position
@@ -37,7 +35,7 @@ class Simulation{
 			 * ======================================
 			 */
 
-			for (int i = 0; i < count; i++){
+			for (size_t i = 0; i < count; i++){
 				// Gravity
 				vy[i] += -GRAVITY * dt; 
 
@@ -105,7 +103,7 @@ class Simulation{
 			 * ======================================
 			 */
 
-			for (int i = 0; i < count; i++){
+			for (size_t i = 0; i < count; i++){
 				x[i] += vx[i] * dt;
 				y[i] += vy[i]  * dt;
 
@@ -134,7 +132,7 @@ class Simulation{
 			 * ======================================
 			 */
 			
-			for (int i = 0; i < count; i++){
+			for (size_t i = 0; i < count; i++){
 				r[i] = rand_colour(gen);
 				g[i] = rand_colour(gen);
 				b[i] = rand_colour(gen);
@@ -146,7 +144,7 @@ class Simulation{
 		* Re-package the position and color vectors
 		* for the GPU's VBO
 		*/	
-		void gpu_buffer_init(){
+		void pack_gpu_buffer(){
 			gpu_buffer.resize(count * 5);
 
 			for (int i = 0; i < count; i++){
@@ -159,34 +157,34 @@ class Simulation{
 		}
 
 
-		const std::vector<float> &get_particles() const{
+		const std::vector<float> &get_gpu_buffer() const{
 			return gpu_buffer;
 		}
 
-		// Size of a Particle(x, y, r, g, b)
-		const size_t get_particle_size() const{
+		// Size of a stride(x, y, r, g, b)
+		const size_t get_gpu_stride() {
 			return sizeof(float) * 5;
 		}
 
 		// Num of particles in gpu_buffer vector
-		const size_t get_particles_count() const{
+		const size_t get_gpu_particle_count() const{
 			return gpu_buffer.size() / 5;
 		}
 
-		const float  *get_particles_data() {
-			gpu_buffer_init();
+		const float  *get_gpu_buffer_data() {
 			return gpu_buffer.data();
 		}
 
 	private:
-		int count;
+		std::vector<float> gpu_buffer;
+		size_t count;
 		std::vector<float> x, y;
 		std::vector<float> vx, vy;
 		std::vector<float> r, g, b;	
 
 		// set particles start point coordinates
 		void set_coordinates(){
-			for (int i = 0; i < count; i++){
+			for (size_t i = 0; i < count; i++){
 				x[i] = 0.0f;
 				y[i] = 0.0f;
 
@@ -196,7 +194,7 @@ class Simulation{
 		}
 
 		void set_colours(){
-			for (int i = 0; i < count; i++){
+			for (size_t i = 0; i < count; i++){
 				// All white
 
 				r[i] = 1.0f;

@@ -9,7 +9,7 @@
 #include "simulation.cpp"
 #include <algorithm>
 
-const int PARTICLE_COUNT = 1000;
+const size_t PARTICLE_COUNT = 1000;
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const double FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
@@ -58,10 +58,10 @@ int main(){
 	Shader ourShader("../src/vertex.glsl", "../src/fragment.glsl");
 
 	Simulation sim(PARTICLE_COUNT);
-	const std::vector<float> &particles = sim.get_particles();
-	size_t particleSize = sim.get_particle_size();
-	size_t particlesCount = sim.get_particles_count();
-	const float *particlesData = sim.get_particles_data();
+	const std::vector<float> &particles = sim.get_gpu_buffer();
+	size_t particleSize = sim.get_gpu_stride();
+	size_t particlesCount = sim.get_gpu_particle_count();
+	const float *particlesData = sim.get_gpu_buffer_data();
 
 	/*
 	 * ===========================================================
@@ -103,7 +103,8 @@ int main(){
 			accumulator -= FIXED_DT;
 		}
 
-		const float *particlesData = sim.get_particles_data();
+		sim.pack_gpu_buffer();
+		const float *particlesData = sim.get_gpu_buffer_data();
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, particlesCount * particleSize, particlesData);
