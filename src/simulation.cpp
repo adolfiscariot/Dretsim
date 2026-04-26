@@ -173,7 +173,7 @@ class Simulation{
 			return gpu_buffer.size() / 5;
 		}
 
-		const float  *get_particles_data() const{
+		const float  *get_particles_data() {
 			gpu_buffer_init();
 			return gpu_buffer.data();
 		}

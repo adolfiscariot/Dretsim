@@ -78,12 +78,12 @@ int main(){
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, particlesCount * particleSize, particlesData, GL_DYNAMIC_DRAW);
 
-	// Position Attributes. Stride is 8 because 2 floats i.e. x, y
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8, (void *)0);
+	// Position Attributes.
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, particleSize, (void *)0);
 	glEnableVertexAttribArray(0);
 
 	// Color Attributes
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 12, (void *) (2 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, particleSize, (void *) (2 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
 	double accumulator = 0.0f; // Timer for updating particles based on frame time
