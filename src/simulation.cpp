@@ -76,24 +76,20 @@ class Simulation{
 					float dist_y = y[j] - y[i];
 
 					float dist_sqr = (dist_x * dist_x) + (dist_y * dist_y);
-					if (dist_sqr > 0.0001f){ // avoid division by 0
-						float dist = sqrt(dist_sqr);
 
-						float force;
-						if (dist_sqr < 0.05f){
-							force = REP_STRENGTH / dist_sqr;
-						} else{
-							force = ATTR_STRENGTH / dist_sqr;
-						}
+					// avoid division by 0
+					dist_sqr = std::max(dist_sqr, 0.0001f);
+					float dist = sqrt(dist_sqr);
 
-						float fx = (dist_x / dist) * force;
-						float fy = (dist_y / dist) * force;
+					float force = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
 
-						vx[i] += fx  * dt;
-						vy[i] += fy  * dt;
-						vx[j] -= fx  * dt;
-						vy[j] -= fy  * dt;
-					}
+					float fx = (dist_x / dist) * force;
+					float fy = (dist_y / dist) * force;
+
+					vx[i] += fx  * dt;
+					vy[i] += fy  * dt;
+					vx[j] -= fx  * dt;
+					vy[j] -= fy  * dt;
 				}
 			}
 
