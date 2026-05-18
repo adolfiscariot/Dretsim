@@ -2,7 +2,7 @@
 #include <vector>
 #include <random>
 #include <cmath>
-#include "hashgrid.cpp"
+#include "hashgrid.h"
 
 class Simulation{
 
@@ -29,7 +29,7 @@ class Simulation{
 		}
 
 		// update particles position
-		void update_particles(float dt){
+		void update_particles(double dt){
 
 			/*
 			 * ======================================

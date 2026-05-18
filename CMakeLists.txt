@@ -22,6 +22,8 @@ target_include_directories(glad PUBLIC external/glad)
 add_executable(
 	dretsim 
 		src/main.cpp
+		src/simulation.cpp
+		src/hashgrid.cpp
 	)
 
 # Link libraries

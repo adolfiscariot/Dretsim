@@ -8,7 +8,7 @@
 #include <chrono>
 #include "simulation.cpp"
 #include <algorithm>
-#include "hashgrid.cpp"
+#include "hashgrid.h"
 
 const size_t PARTICLE_COUNT = 1000;
 const int WINDOW_WIDTH = 800;
@@ -127,5 +127,6 @@ int main(){
 	glfwTerminate();
 	return 0;
 }
+
 
 
