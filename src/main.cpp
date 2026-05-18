@@ -8,6 +8,7 @@
 #include <chrono>
 #include "simulation.cpp"
 #include <algorithm>
+#include "hashgrid.cpp"
 
 const size_t PARTICLE_COUNT = 1000;
 const int WINDOW_WIDTH = 800;
@@ -57,7 +58,8 @@ int main(){
 	// Build and compile our shader program
 	Shader ourShader("../src/vertex.glsl", "../src/fragment.glsl");
 
-	Simulation sim(PARTICLE_COUNT);
+	HashGrid hashgrid(PARTICLE_COUNT, FIXED_DT);
+	Simulation sim(PARTICLE_COUNT, hashgrid);
 	const std::vector<float> &particles = sim.get_gpu_buffer();
 	size_t particleSize = sim.get_gpu_stride();
 	size_t particlesCount = sim.get_gpu_particle_count();

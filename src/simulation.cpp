@@ -2,12 +2,14 @@
 #include <vector>
 #include <random>
 #include <cmath>
+#include "hashgrid.cpp"
 
 class Simulation{
 
 	public:
-		Simulation(size_t count): 
+		Simulation(size_t count, HashGrid &grid): 
 			count(count),
+			grid(grid),
 			gen(ran_dev()),
 			wind_noise(-0.01f, 0.01f),
 			rand_colour(0.0f, 1.0f)
@@ -70,28 +72,31 @@ class Simulation{
 			 * opposite force. Attraction & Repulsion are both implemented.
 			 */
 
-			for (size_t i = 0; i < count; i++){
-				for (size_t j = i + 1; j < count; j++){
-					float dist_x = x[j] - x[i];
-					float dist_y = y[j] - y[i];
-
-					float dist_sqr = (dist_x * dist_x) + (dist_y * dist_y);
-
-					// avoid division by 0
-					dist_sqr = std::max(dist_sqr, 0.0001f);
-					float dist = sqrt(dist_sqr);
-
-					float force = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
-
-					float fx = (dist_x / dist) * force;
-					float fy = (dist_y / dist) * force;
-
-					vx[i] += fx  * dt;
-					vy[i] += fy  * dt;
-					vx[j] -= fx  * dt;
-					vy[j] -= fy  * dt;
-				}
-			}
+//			for (size_t i = 0; i < count; i++){
+//				for (size_t j = i + 1; j < count; j++){
+//					float dist_x = x[j] - x[i];
+//					float dist_y = y[j] - y[i];
+//
+//					float dist_sqr = (dist_x * dist_x) + (dist_y * dist_y);
+//
+//					// avoid division by 0
+//					dist_sqr = std::max(dist_sqr, 0.0001f);
+//					float dist = sqrt(dist_sqr);
+//
+//					float force = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
+//
+//					float fx = (dist_x / dist) * force;
+//					float fy = (dist_y / dist) * force;
+//
+//					vx[i] += fx  * dt;
+//					vy[i] += fy  * dt;
+//					vx[j] -= fx  * dt;
+//					vy[j] -= fy  * dt;
+//				}
+//			}
+//
+			grid.build(x, y);
+			grid.query(x, y, vx, vy);
 
 			/*
 			 * ======================================
@@ -172,8 +177,16 @@ class Simulation{
 		}
 
 	private:
+		// buffer used to prepare SoA values for the GPU 
 		std::vector<float> gpu_buffer;
+
+		// particle count
 		size_t count;
+
+		// hashgrid object
+		HashGrid &grid;
+
+		// Positions, velocities, colours
 		std::vector<float> x, y;
 		std::vector<float> vx, vy;
 		std::vector<float> r, g, b;	
@@ -189,6 +202,7 @@ class Simulation{
 			}
 		}
 
+		// set particle colors
 		void set_colours(){
 			for (size_t i = 0; i < count; i++){
 				// All white
@@ -199,6 +213,7 @@ class Simulation{
 			}
 		}
 
+		// generate random values(wind, colour)
 		std::random_device ran_dev;
 		std::mt19937 gen;
 
