@@ -13,7 +13,7 @@
 const size_t PARTICLE_COUNT = 1000;
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
-const double FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
+const float FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 	glViewport(0, 0, width, height);
