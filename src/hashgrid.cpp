@@ -40,7 +40,7 @@ std::vector<std::pair<int, int>> HashGrid::get_closest_cells(std::pair<int, int>
 	std::pair<int, int> top_middle    = {cell.first,     cell.second + 1};
 	std::pair<int, int> top_right     = {cell.first + 1, cell.second + 1};
 	std::pair<int, int> middle_left   = {cell.first - 1, cell.second    };
-	std::pair<int, int> middle_right = {cell.first + 1, cell.second    };
+	std::pair<int, int> middle_right  = {cell.first + 1, cell.second    };
 	std::pair<int, int> bottom_left   = {cell.first - 1, cell.second - 1};
 	std::pair<int, int> bottom_middle = {cell.first,     cell.second - 1};
 	std::pair<int, int> bottom_right  = {cell.first + 1, cell.second - 1};
@@ -57,19 +57,27 @@ std::vector<int> &HashGrid::get_particles_in_nearby_cell(std::pair<int, int> cel
 
 // Calculate interaction. Find distance between cells and interact.
 void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closest_particles, std::vector<float> &x, std::vector<float> &y, std::vector<float> &vx, std::vector<float> &vy){
-	for(int close_particle : closest_particles){
+	for(int &close_particle : closest_particles){
 		if(main_particle == close_particle) continue;
-		float dist_x = x[close_particle] - x[main_particle];
-		float dist_y = y[close_particle] - y[main_particle];
+
+		float main_x  = x[main_particle];
+		float close_x = x[close_particle];
+		float main_y  = y[main_particle];
+		float close_y = y[close_particle];
+
+		float dist_x  = close_x - main_x;
+		float dist_y  = close_y - main_y;
+
 		float dist_sqr = std::max((dist_x * dist_x) + (dist_y * dist_y), 0.0001f);
 		float force = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
-		float dist = sqrt(dist_sqr);
-		float fx = (dist_x / dist) * force;
-		float fy = (dist_y / dist) * force;
 
-		vx[main_particle] += fx * _dt;
-		vy[main_particle] += fy * _dt;
+		float inv_dist = 1.0f / sqrtf(dist_sqr);
+		float fx = dist_x * inv_dist * force;
+		float fy = dist_y * inv_dist * force;
+
+		vx[main_particle]  += fx * _dt;
 		vx[close_particle] -= fx * _dt;
+		vy[main_particle]  += fy * _dt;
 		vy[close_particle] -= fy * _dt;
 
 	}	

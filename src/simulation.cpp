@@ -29,7 +29,7 @@ class Simulation{
 		}
 
 		// update particles position
-		void update_particles(double dt){
+		void update_particles(float dt){
 
 			/*
 			 * ======================================
@@ -133,11 +133,11 @@ class Simulation{
 			 * ======================================
 			 */
 			
-			for (size_t i = 0; i < count; i++){
-				r[i] = rand_colour(gen);
-				g[i] = rand_colour(gen);
-				b[i] = rand_colour(gen);
-			}
+			//for (size_t i = 0; i < count; i++){
+			//	r[i] = rand_colour(gen);
+			//	g[i] = rand_colour(gen);
+			//	b[i] = rand_colour(gen);
+			//}
 		}
 
 
@@ -205,11 +205,9 @@ class Simulation{
 		// set particle colors
 		void set_colours(){
 			for (size_t i = 0; i < count; i++){
-				// All white
-
-				r[i] = 1.0f;
-				g[i] = 1.0f;
-				b[i] = 1.0f;
+				r[i] = rand_colour(gen);
+				g[i] = rand_colour(gen);
+				b[i] = rand_colour(gen);
 			}
 		}
 
@@ -230,8 +228,4 @@ class Simulation{
 
 		// Attract to center settings
 		const float PULL_MULTIPLIER = 0.001f;
-
-		// Attraction & Repulsion settings. Close particles = strong repulsion & vice-versa.
-		const float ATTR_STRENGTH = 0.0001f;
-		const float REP_STRENGTH = -0.001f;
 };
