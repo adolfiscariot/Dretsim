@@ -61,8 +61,8 @@ void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closes
 		if(main_particle == close_particle) continue;
 
 		float main_x  = x[main_particle];
-		float close_x = x[close_particle];
 		float main_y  = y[main_particle];
+		float close_x = x[close_particle];
 		float close_y = y[close_particle];
 
 		float dist_x  = close_x - main_x;
@@ -72,12 +72,13 @@ void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closes
 		float force = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
 
 		float inv_dist = 1.0f / sqrtf(dist_sqr);
-		float fx = dist_x * inv_dist * force;
-		float fy = dist_y * inv_dist * force;
+		float inv_dist_by_force = inv_dist * force;
+		float fx = dist_x * inv_dist_by_force;
+		float fy = dist_y * inv_dist_by_force;
 
 		vx[main_particle]  += fx * _dt;
-		vx[close_particle] -= fx * _dt;
 		vy[main_particle]  += fy * _dt;
+		vx[close_particle] -= fx * _dt;
 		vy[close_particle] -= fy * _dt;
 
 	}	
@@ -85,7 +86,7 @@ void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closes
 
 // Insert in hashtable
 void HashGrid::build(std::vector<float> &x, std::vector<float> &y){
-	for (auto bucket: hashtable) bucket.clear();
+	for (auto &bucket: hashtable) bucket.clear();
 	for (int i = 0; i < _particle_count; i++){
 		std::pair<int, int> cell = get_particle_cell(x[i], y[i]);
 		int hash = calculate_hash(cell);

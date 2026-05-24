@@ -197,8 +197,8 @@ class Simulation{
 				x[i] = 0.0f;
 				y[i] = 0.0f;
 
-				vx[i] = 0.0f;
-				vy[i] = 0.0f;
+				vx[i] = 0.1f;
+				vy[i] = 0.1f;
 			}
 		}
 

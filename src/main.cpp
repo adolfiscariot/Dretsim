@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "hashgrid.h"
 
-const size_t PARTICLE_COUNT = 1000;
+const size_t PARTICLE_COUNT = 100;
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const float FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
