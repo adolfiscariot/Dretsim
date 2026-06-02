@@ -19,18 +19,14 @@ HashGrid::HashGrid(size_t particle_count, float dt):
 
 // Take the position of a particle and find its cell
 std::pair<int, int> HashGrid::get_particle_cell(float x, float y){
-	int cx = std::floor(x / cell_size);
-	int cy = std::floor(y / cell_size);
-
-	std::pair<int, int> cell = {cx, cy};
-	return cell;
+	return {static_cast<int>(std::floor(x/cell_size)), static_cast<int>(std::floor(y/cell_size))};
 }
+
 
 // Calculate hash 
 int HashGrid::calculate_hash(std::pair<int, int> cell){
 	uint32_t hash = ((cell.first * PRIME_1) ^ (cell.second * PRIME_2)) ;
-	hash = std::abs(static_cast<int>(hash % _particle_count));
-	return hash;
+	return static_cast<int>(hash % _particle_count);
 }
 
 
@@ -57,29 +53,49 @@ std::vector<int> &HashGrid::get_particles_in_nearby_cell(std::pair<int, int> cel
 
 // Calculate interaction. Find distance between cells and interact.
 void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closest_particles, std::vector<float> &x, std::vector<float> &y, std::vector<float> &vx, std::vector<float> &vy){
+	// Pointers to the starting address of these vectors to
+	// avoid double jumps to the vector manager object then
+	// the starting address
+	const float* const p_x = x.data();
+	const float* const p_y = y.data();
+	float* const p_vx = vx.data();
+	float* const p_vy = vy.data();
+
+	float main_x  = x[main_particle];
+	float main_y  = y[main_particle];
+
+	float main_vx_accum = 0.0f;
+	float main_vy_accum = 0.0f;
+
 	for(int &close_particle : closest_particles){
-		if(main_particle == close_particle) continue;
+		// Calculate the force once i.e. calculate it
+		// when main_particle is index 2 and close_particle
+		// is 7 but when main_partiicle becomes 7
+		// and close_particle becomes 2 don't calculate
+		// it again.
+		if(main_particle >= close_particle) continue;
 
-		float main_x  = x[main_particle];
-		float main_y  = y[main_particle];
-		float close_x = x[close_particle];
-		float close_y = y[close_particle];
+		;
+		p_y[close_particle];
 
-		float dist_x  = close_x - main_x;
-		float dist_y  = close_y - main_y;
+		float dist_x  = p_x[close_particle]- main_x;
+		float dist_y  = p_y[close_particle]- main_y;
 
-		float dist_sqr = std::max((dist_x * dist_x) + (dist_y * dist_y), 0.0001f);
-		float force = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
+		float dist_sqr = (dist_x * dist_x) + (dist_y * dist_y);
+		if (dist_sqr < 0.0001f) dist_sqr = 0.0001f;
+
+		float force    = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
 
 		float inv_dist = 1.0f / sqrtf(dist_sqr);
-		float inv_dist_by_force = inv_dist * force;
+		float inv_dist_by_force = inv_dist * force * _dt;
+
 		float fx = dist_x * inv_dist_by_force;
 		float fy = dist_y * inv_dist_by_force;
 
-		vx[main_particle]  += fx * _dt;
-		vy[main_particle]  += fy * _dt;
-		vx[close_particle] -= fx * _dt;
-		vy[close_particle] -= fy * _dt;
+		main_vx_accum += fx;
+		main_vy_accum += fy;
+		p_vx[close_particle] -= fx;
+		p_vy[close_particle] -= fy;
 
 	}	
 }
