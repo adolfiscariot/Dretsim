@@ -6,7 +6,7 @@
 #include <vector>
 #include <random>
 #include <chrono>
-#include "simulation.cpp"
+#include "simulation.h"
 #include <algorithm>
 #include "hashgrid.h"
 
