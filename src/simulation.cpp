@@ -62,37 +62,6 @@ void Simulation::update_particles(float dt){
 	 * ======================================
 	 */
 
-	/*
-	 * O(n^2) loop as each particle measures it's distance from all other
-	 * particles. The square of this distance is used to find the force
-	 * to be applied via inverse-square law.This force is applied to both 
-	 * particles as per Newton's 3rd law: each force begets an equal and 
-	 * opposite force. Attraction & Repulsion are both implemented.
-	 */
-
-//			for (size_t i = 0; i < count; i++){
-//				for (size_t j = i + 1; j < count; j++){
-//					float dist_x = x[j] - x[i];
-//					float dist_y = y[j] - y[i];
-//
-//					float dist_sqr = (dist_x * dist_x) + (dist_y * dist_y);
-//
-//					// avoid division by 0
-//					dist_sqr = std::max(dist_sqr, 0.0001f);
-//					float dist = sqrt(dist_sqr);
-//
-//					float force = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
-//
-//					float fx = (dist_x / dist) * force;
-//					float fy = (dist_y / dist) * force;
-//
-//					vx[i] += fx  * dt;
-//					vy[i] += fy  * dt;
-//					vx[j] -= fx  * dt;
-//					vy[j] -= fy  * dt;
-//				}
-//			}
-//
 	grid.build(x, y);
 	grid.query(x, y, vx, vy);
 
@@ -124,18 +93,6 @@ void Simulation::update_particles(float dt){
 			vy[i] = -vy[i];
 		}
 	}
-
-	/*
-	 * ======================================
-	 * 4. UPDATE PARTICLE COLOUR
-	 * ======================================
-	 */
-	
-	//for (size_t i = 0; i < count; i++){
-	//	r[i] = rand_colour(gen);
-	//	g[i] = rand_colour(gen);
-	//	b[i] = rand_colour(gen);
-	//}
 }
 
 
