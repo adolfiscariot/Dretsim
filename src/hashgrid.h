@@ -7,7 +7,6 @@ class HashGrid{
 		HashGrid(size_t particle_count, float dt); 
 		std::pair<int, int> get_particle_cell(float x, float y);
 		int calculate_hash(std::pair<int, int> cell);
-		std::vector<std::pair<int, int>> get_closest_cells(std::pair<int, int> cell);
 		std::vector<int> &get_particles_in_nearby_cell(std::pair<int, int> cell);
 		void calculate_interaction(int main_particle, std::vector<int> &closest_particles, std::vector<float> &x, std::vector<float> &y, std::vector<float> &vx, std::vector<float> &vy);
 		void build(std::vector<float> &x, std::vector<float> &y);
