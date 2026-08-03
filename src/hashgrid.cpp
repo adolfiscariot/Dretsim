@@ -106,7 +106,7 @@ void HashGrid::query(std::vector<float> &x, std::vector<float> &y, std::vector<f
 	for (int i = 0; i < _particle_count; i++){
 		std::pair<int, int> cell = get_particle_cell(x[i], y[i]);
 		for (int dx = -1; dx <= 1; dx++){
-			for (int dy = -1; dy <= -1; dy++){
+			for (int dy = -1; dy <= 1; dy++){
 				std::pair<int, int> close_cell = {cell.first + dx, cell.second + dy};
 				int hash = calculate_hash(close_cell);
 				std::vector<int> &close_particles = hashtable[hash];
