@@ -1,7 +1,8 @@
 // SPATIAL HASH GRID IMPLEMENTATION
-// What we wanna do is take each particle and get its cell. Then create a hashtable
-// where all particles in the same cell are placed in the same array index. Then 
-// we find the particles in the surrounding 8 cells (2D field) and attract/repel them
+// What we wanna do is take each particle and get its cell. Then calculate the hash
+// of each  cell and put use it as an index in thee cell_hashes vector. We then
+// ensure all particles live within a particle_ids vector. Then we find the particles
+// in the surrounding 8 cells (2D field) and attract/repel them
 
 
 #include <iostream>
@@ -14,7 +15,8 @@ HashGrid::HashGrid(size_t particle_count, float dt):
 			_particle_count(particle_count),
 			_dt(dt)
 		{
-			hashtable.resize(_particle_count);
+			cell_hashes.resize(_particle_count);
+			particle_ids.resize(_particle_count);
 		}
 
 // Take the position of a particle and find its cell
@@ -31,9 +33,9 @@ int HashGrid::calculate_hash(std::pair<int, int> cell){
 
 
 // Get particles in those nearby cells. Return vector of particle ids. 
-std::vector<int> &HashGrid::get_particles_in_nearby_cell(std::pair<int, int> cell){
+int HashGrid::get_particles_in_nearby_cell(std::pair<int, int> cell){
 	int hash = calculate_hash(cell);	
-	return hashtable[hash];
+	return cell_hashes[hash];
 }
 
 // Calculate interaction. Find distance between cells and interact.
