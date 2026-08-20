@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <vector>
 #include <cmath>
+#include <span>
 #include "hashgrid.h"
 
 HashGrid::HashGrid(size_t particle_count, float dt): 
@@ -93,13 +94,28 @@ void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closes
 
 // Insert in hashtable
 void HashGrid::build(std::vector<float> &x, std::vector<float> &y){
-	for (auto &bucket: hashtable) bucket.clear();
-	for (int i = 0; i < _particle_count; i++){
-		std::pair<int, int> cell = get_particle_cell(x[i], y[i]);
-		int hash = calculate_hash(cell);
-		hashtable[hash].push_back(i); 
+	// Set cell_countst to 0 every frame
+	std::fill(cell_counts.begin(), cell_counts.end(), 0);
 
+	// Iterate through all particles, find their cell, cache the cell's hash
+	// and increase that hash in cell_counts by 1 meaning another particle
+	// is living in that cell
+	for (int i = 0; i < _particle_count; i++){
+		std::pair<int, int> cell = get_particle_cell(x[i],y[i]);
+		particle_hashes[i] = hash;
+		cell_counts[hash]++;
 	}
+
+	// Build cell_offsets from celll_counts
+	int current_offset = 0;
+	for (size_t c = 0; c < cell_counts.size(); c++){
+		cell_offsets[c] = current_offset;
+		current_offset += cell_counts[c];
+	}
+	cell_offsets[cell_counts.size()] = current_offset;
+
+	// TO BE CONTINUED
+		
 }
 
 // For each particle, find its cell, find that cell's closest cells, get the particles in those

@@ -44,8 +44,14 @@ class HashGrid{
 		const float REP_STRENGTH = -0.001f;
 
 		// Flat Grid Data Structures
-		std::vector<int> cell_offsets;
-		std::vector<int> particle_ids;
+		std::vector<int> cell_offsets;    // Stores starting index of each cell's 1st particle
+		std::vector<int> particle_ids;    // Stores each particle's ID
+						  
+		// Stores the # of particles in each cell. Needed to calculate cell offsets
+		std::vector<int> cell_counts;     
 
-		// Keep going tomorrow!
+		// Stores the cell hash of each particle. Needed to avoid repeating division
+		// in the build function
+		std::vector<int> particle_hashes; 
+
 };
