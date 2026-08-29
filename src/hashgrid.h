@@ -16,7 +16,7 @@ class HashGrid{
 		// Takes a span of neighbouring particles's IDs
 		void calculate_interaction(
 				int main_particle, 
-				std::vector<int> &closest_particles, 
+				std::span<const int> closest_particles, 
 				std::vector<float> &x, 
 				std::vector<float> &y, 
 				std::vector<float> &vx, 

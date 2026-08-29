@@ -1,10 +1,10 @@
 // SPATIAL HASH GRID IMPLEMENTATION
 // What we wanna do is take each particle and get its cell. Then calculate the hash
-// of each  cell and put use it as an index in thee cell_hashes vector. We then
+// of each  cell and put use it as an index in the particle_hashes vector. We then
 // ensure all particles live within a particle_ids vector. Then we find the particles
 // in the surrounding 8 cells (2D field) and attract/repel them
 
-
+#include <algorithm>
 #include <iostream>
 #include <cstdint>
 #include <vector>
@@ -16,8 +16,10 @@ HashGrid::HashGrid(size_t particle_count, float dt):
 			_particle_count(particle_count),
 			_dt(dt)
 		{
-			cell_hashes.resize(_particle_count);
+			particle_hashes.resize(_particle_count);
 			particle_ids.resize(_particle_count);
+			cell_counts.resize(_particle_count,0);
+			cell_offsets.resize(_particle_count + 1, 0);
 		}
 
 // Take the position of a particle and find its cell
@@ -33,14 +35,18 @@ int HashGrid::calculate_hash(std::pair<int, int> cell){
 }
 
 
-// Get particles in those nearby cells. Return vector of particle ids. 
-int HashGrid::get_particles_in_nearby_cell(std::pair<int, int> cell){
+// Get particles in those nearby cells using flat meory span
+std::span<const int> HashGrid::get_particles_in_nearby_cell(std::pair<int, int> cell){
 	int hash = calculate_hash(cell);	
-	return cell_hashes[hash];
+	int start_idx = cell_offsets[hash];
+	int end_idx = cell_offsets[hash + 1];
+
+	if (start_idx >= end_idx) return {}; // cell is empty
+	return std::span<const int>(&particle_ids[start_idx], end_idx - start_idx);
 }
 
 // Calculate interaction. Find distance between cells and interact.
-void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closest_particles, std::vector<float> &x, std::vector<float> &y, std::vector<float> &vx, std::vector<float> &vy){
+void HashGrid::calculate_interaction(int main_particle, std::span<const int> closest_particles, std::vector<float> &x, std::vector<float> &y, std::vector<float> &vx, std::vector<float> &vy){
 	// Pointers to the starting address of these vectors to
 	// avoid double jumps to the vector manager object then
 	// the starting address
@@ -56,7 +62,7 @@ void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closes
 	float main_vx_accum = 0.0f;
 	float main_vy_accum = 0.0f;
 
-	for(int &close_particle : closest_particles){
+	for(int close_particle : closest_particles){
 		// Calculate the force once i.e. calculate it
 		// when main_particle is index 2 and close_particle
 		// is 7 but when main_partiicle becomes 7
@@ -94,19 +100,20 @@ void HashGrid::calculate_interaction(int main_particle, std::vector<int> &closes
 
 // Insert in hashtable
 void HashGrid::build(std::vector<float> &x, std::vector<float> &y){
-	// Set cell_countst to 0 every frame
+	// Set cell_counts to 0 every frame so that a cell doesn't 
+	// report having more particles than it actually has
 	std::fill(cell_counts.begin(), cell_counts.end(), 0);
 
 	// Iterate through all particles, find their cell, cache the cell's hash
-	// and increase that hash in cell_counts by 1 meaning another particle
+	// and increase that hash in cell_counts by 1 because now another particle
 	// is living in that cell
 	for (int i = 0; i < _particle_count; i++){
-		std::pair<int, int> cell = get_particle_cell(x[i],y[i]);
+		int hash = calculate_hash(get_particle_cell(x[i],y[i]));
 		particle_hashes[i] = hash;
 		cell_counts[hash]++;
 	}
 
-	// Build cell_offsets from celll_counts
+	// Build cell_offsets from cell_counts. First offset is always 0
 	int current_offset = 0;
 	for (size_t c = 0; c < cell_counts.size(); c++){
 		cell_offsets[c] = current_offset;
@@ -114,8 +121,13 @@ void HashGrid::build(std::vector<float> &x, std::vector<float> &y){
 	}
 	cell_offsets[cell_counts.size()] = current_offset;
 
-	// TO BE CONTINUED
-		
+	// Fill particle_ids using hashed particle_hashes
+	std::vector<int> temp_offsets = cell_offsets;
+	for (int i = 0; i < _particle_count; i++){
+		int hash = particle_hashes[i];
+		int dest_index = temp_offsets[hash]++;
+		particle_ids[dest_index] = i;
+	}	
 }
 
 // For each particle, find its cell, find that cell's closest cells, get the particles in those
@@ -126,8 +138,9 @@ void HashGrid::query(std::vector<float> &x, std::vector<float> &y, std::vector<f
 		for (int dx = -1; dx <= 1; dx++){
 			for (int dy = -1; dy <= 1; dy++){
 				std::pair<int, int> close_cell = {cell.first + dx, cell.second + dy};
-				int hash = calculate_hash(close_cell);
-				std::vector<int> &close_particles = hashtable[hash];
+
+				// Fetch zero-allocation span slice directly
+				std::span< const int> close_particles = get_particles_in_nearby_cell(close_cell);
 				calculate_interaction(i, close_particles, x, y, vx, vy);
 
 			}
