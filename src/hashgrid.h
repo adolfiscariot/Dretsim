@@ -39,7 +39,7 @@ class HashGrid{
 		static constexpr int PRIME_1 = 73856093;
 		static constexpr int PRIME_2 = 19349663;
 
-		static constexpr float cell_size = 0.0625f;
+		static constexpr float cell_size = 0.000625f;
 		const float ATTR_STRENGTH = 0.0001f;
 		const float REP_STRENGTH = -0.001f;
 

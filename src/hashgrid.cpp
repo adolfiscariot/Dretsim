@@ -148,5 +148,3 @@ void HashGrid::query(std::vector<float> &x, std::vector<float> &y, std::vector<f
 	}
 }
 
-
-

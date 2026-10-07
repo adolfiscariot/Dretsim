@@ -10,10 +10,10 @@
 #include <algorithm>
 #include "hashgrid.h"
 
-const size_t PARTICLE_COUNT = 100;
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
-const float FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
+constexpr size_t PARTICLE_COUNT = 10000;
+constexpr int WINDOW_WIDTH = 800;
+constexpr int WINDOW_HEIGHT = 600;
+constexpr float FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 	glViewport(0, 0, width, height);
@@ -100,8 +100,14 @@ int main(){
 		accumulator += frameTime;
 		processInput(window);
 
+		int updates = 0;
 		while (accumulator >= FIXED_DT){
+			auto start = std::chrono::high_resolution_clock::now();
 			sim.update_particles(FIXED_DT);
+			auto end = std::chrono::high_resolution_clock::now();
+			auto duration = std::chrono::duration<double, std::milli>(end- start).count();
+			std::cout << "Duration is: " << duration << " milliseconds \n";
+			updates++;
 			accumulator -= FIXED_DT;
 		}
 
