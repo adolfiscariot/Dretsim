@@ -14,6 +14,7 @@ constexpr size_t PARTICLE_COUNT = 1000;
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
 constexpr float FIXED_DT = 1.0f / 60.0f; //How often we do our physics updates
+constexpr int MAX_STEPS_PER_FRAME = 4;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 	glViewport(0, 0, width, height);
@@ -44,7 +45,7 @@ int main(){
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(0);
+	glfwSwapInterval(1);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // For resizing the screen
 
 	// Retrieve glad's opengl function pointers by asking the graphics driver for their address
@@ -92,18 +93,29 @@ int main(){
 	double lastTime = glfwGetTime();
 
 	while(!glfwWindowShouldClose(window)){
-		// Simulation should happen 60 times per second regardless of the machine's frame rate
 		double currentTime = glfwGetTime();
-		double frameTime = currentTime - lastTime;
+		// Cap elapsed time to 100ms because too large of an elapsed time means
+		// more physics updates to do 
+		double frameTime = std::min(currentTime - lastTime, 0.1);
 		lastTime = currentTime;
 
 		accumulator += frameTime;
 		processInput(window);
 
-		while (accumulator >= FIXED_DT){
+		// We're sacrificing perfect synchronization with responsiveness by
+		// capping the number of physics updates done at any one time to 4.
+		// Assume the CPU is slow and the accumulator grows to 200, we'd need
+		// to run about 12 physics updates which will only slow the system even
+		// more creating this nasty loop. Instead we say no more than 4 updates
+		// and if there are any more, forget about them.
+		int steps = 0;
+		while (accumulator >= FIXED_DT && steps < MAX_STEPS_PER_FRAME){
 			sim.update_particles(FIXED_DT);
 			accumulator -= FIXED_DT;
+			++steps;
 		}
+
+		if (steps == MAX_STEPS_PER_FRAME) accumulator = 0.0;
 
 		sim.pack_gpu_buffer();
 		const float *particlesData = sim.get_gpu_buffer_data();
@@ -111,7 +123,6 @@ int main(){
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, particlesCount * particleSize, particlesData);
 
-		//glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 

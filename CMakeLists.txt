@@ -32,9 +32,10 @@ target_compile_options(
 		-g
 		-fno-omit-frame-pointer
 		-march=native
-		-fopt-info-vec-optimized
-		-fopt-info-vec-missed
-		-fopt-info-vec-all
+		-ffast-math
+		#-fopt-info-vec-optimized
+		#-fopt-info-vec-missed
+		#-fopt-info-vec-all
 	)
 
 # Link libraries
