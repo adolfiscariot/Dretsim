@@ -35,7 +35,7 @@ int HashGrid::calculate_hash(std::pair<int, int> cell){
 }
 
 
-// Get particles in those nearby cells using flat meory span
+// Get particles in those nearby cells using flat memory span
 std::span<const int> HashGrid::get_particles_in_nearby_cell(std::pair<int, int> cell){
 	int hash = calculate_hash(cell);	
 	int start_idx = cell_offsets[hash];
@@ -48,24 +48,24 @@ std::span<const int> HashGrid::get_particles_in_nearby_cell(std::pair<int, int> 
 // Calculate interaction. Find distance between cells and interact.
 void HashGrid::calculate_interaction(int main_particle, std::span<const int> closest_particles, std::vector<float> &x, std::vector<float> &y, std::vector<float> &vx, std::vector<float> &vy){
 	// Pointers to the starting address of these vectors to
-	// avoid double jumps to the vector manager object then
+	// avoid double jumps to the vector object then
 	// the starting address
-	const float* const p_x = x.data();
-	const float* const p_y = y.data();
-	float* const p_vx = vx.data();
-	float* const p_vy = vy.data();
+	const float* const p_x   = x.data();
+	const float* const p_y   = y.data();
+	float* const       p_vx  = vx.data();
+	float* const       p_vy  = vy.data();
 
-	float main_x = p_x[main_particle];
-	float main_y = p_y[main_particle];
+	float main_x  = p_x[main_particle];
+	float main_y  = p_y[main_particle];
 
 	// Store accumulations in registers then at the end store in memory 
-	float main_vx_accum = 0.0f;
-	float main_vy_accum = 0.0f;
+	float main_vx_accum  = 0.0f;
+	float main_vy_accum  = 0.0f;
 
 	for(int close_particle : closest_particles){
 		// Calculate the force once i.e. calculate it
 		// when main_particle is index 2 and close_particle
-		// is 7 but when main_partiicle becomes 7
+		// is 7 but when main_particle becomes 7
 		// and close_particle becomes 2 don't calculate
 		// it again.
 		if(main_particle >= close_particle) continue;
@@ -78,7 +78,7 @@ void HashGrid::calculate_interaction(int main_particle, std::span<const int> clo
 
 		float force = (dist_sqr < 0.05f) ? REP_STRENGTH / dist_sqr : ATTR_STRENGTH / dist_sqr;
 
-		// Use the inverse to avoid expensive division arithmetic in inv_dist_by_force 
+		// Use the inverse to reduce expensive division arithmetic in inv_dist_by_force 
 		// since (dist_x/ sqrtf(dist_sqr)) * force == 1/sqrtf(dist_sqr) * force 
 		float inv_dist = 1.0f / sqrtf(dist_sqr);
 		float inv_dist_by_force = inv_dist * force * _dt;

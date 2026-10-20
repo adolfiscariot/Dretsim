@@ -8,7 +8,7 @@ project(dretsim)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-O2 -g -fno-omit-frame-pointer -march=native")
+#set(CMAKE_CXX_FLAGS "-O2 -g -fno-omit-frame-pointer -march=native")
 
 # Find packages
 find_package(OpenGL REQUIRED)
@@ -24,6 +24,17 @@ add_executable(
 		src/main.cpp
 		src/simulation.cpp
 		src/hashgrid.cpp
+	)
+
+target_compile_options(
+	dretsim PRIVATE
+		-O3
+		-g
+		-fno-omit-frame-pointer
+		-march=native
+		-fopt-info-vec-optimized
+		-fopt-info-vec-missed
+		-fopt-info-vec-all
 	)
 
 # Link libraries

@@ -19,6 +19,8 @@ Simulation::Simulation(size_t count, HashGrid &grid):
 	r.resize(count);
 	g.resize(count);
 	b.resize(count);
+	wind_x.resize(count);
+	wind_y.resize(count);
 
 	set_coordinates();
 	set_colours();
@@ -36,12 +38,17 @@ void Simulation::update_particles(float dt){
 	 */
 
 	for (size_t i = 0; i < count; i++){
+		wind_x[i] = wind_noise(gen);
+		wind_y[i] = wind_noise(gen);
+	}
+
+	for (size_t i = 0; i < count; i++){
 		// Gravity
 		vy[i] += -GRAVITY * dt; 
 
 		// Wind 
-		vx[i] += (WIND_X + wind_noise(gen)) * dt;
-		vy[i] += (WIND_Y + wind_noise(gen)) * dt;
+		vx[i] += (WIND_X + wind_x[i]) * dt;
+		vy[i] += (WIND_Y + wind_y[i]) * dt;
 
 		// Attract to center
 		float dx = 0.0f - x[i];

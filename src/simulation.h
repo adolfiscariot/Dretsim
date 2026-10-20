@@ -19,6 +19,7 @@ class Simulation{
 		std::vector<float> x, y;
 		std::vector<float> vx, vy;
 		std::vector<float> r, g, b;
+		std::vector<float> wind_x, wind_y;
 		std::random_device ran_dev;
 		std::mt19937 gen;
 		std::uniform_real_distribution<float> rand_colour;
