@@ -28,14 +28,7 @@ class Simulation{
 		const float WIND_Y = 0.0f;
 		std::uniform_real_distribution<float> wind_noise;
 		const float PULL_MULTIPLIER = 0.001f;
-		//void set_coordinates(){
-		//	for (size_t i = 0; i < count; i++){
-		//		x[i]  = 0.0f;
-		//		y[i]  = 0.0f;
-		//		vx[i] = 0.1f;
-		//		vy[i] = 0.1f;
-		//	}
-		//}
+
 		void set_coordinates(){
 			std::uniform_real_distribution<float> pos(-1.0f, 1.0f);
 			std::uniform_real_distribution<float> vel(-0.05f, 0.05f);
