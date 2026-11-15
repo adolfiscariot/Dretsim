@@ -7,6 +7,7 @@
 
 #include "world.h"
 #include <iostream>
+#include <algorithm>
 
 
 class SquareGrid{
@@ -36,12 +37,53 @@ class SquareGrid{
 			return {
 
 				static_cast<int>(
-					std::floor((x - _world::MIN) / _world::cell_size)
+					std.floor((x - _world.MIN) / _world.cell_size)
 					),
 				static_cast<int>(
-					std::floor((y - _world::MIN) / _world::cell_size)
+					std.floor((y - _world.MIN) / _world.cell_size)
 					)
 			};
+		}
+
+
+		/*
+		 * Implement get_cell_index()!
+		 */
+		void build(std::vector<float> &x, std::vector<float> &y){
+			std::fill(_cell_counts.begin(), _cell_counts.end(), 0);
+			
+			/*
+			 * Put every particle in _particle_ids. I'm using vector x
+			 * but I can use y too without any difference.
+			 */
+
+			for (size_t i = 0; i < x.size(); i++){
+				auto particle_cell = get_particle_cell(x[i], y[i]);
+				auto cell_index = get_cell_index(particle_cell);
+				/* 
+				 * add 1 to _cell_counts[_cell_index] to show that index 
+				 * cell_index has received one more particle. 
+				 */
+				_cell_counts[cell_index]++; 
+			}
+
+			/*
+			 *  We've filled up cell_counts. Now it's time to use that data
+			 *  to fill up cell_offsets which tells us where exactly in the
+			 *  particle_ids vector each cell's particles start and end i.e.
+			 *  cell_offsets[i+1] - cell_offsets[i] = _cell_counts[i].
+			 *  p0-c1, p1-c3, p2-c0, p3-c0, p4-c2
+			 *  _particle_ids = [3, 2, 0, 4, 1]
+			 *  _cell_counts  = [2, 1, 1, 1, 0]
+			 *  _cell_offsets = [0, 2, 3, 4, 5, 5]
+			 */
+			
+			size_t initial_offset = 0;
+			for (size_t j = 0; j < _cell_counts.size(); j++){
+				_cell_offsets[j] = initial_offset;
+				initial_offset += _cell_counts[j];
+			}
+			_cell_offsets[_cell_counts.size()] = initial_offset;
 		}
 
 
@@ -71,4 +113,5 @@ class SquareGrid{
 		size_t _particle_count;
 		std::vector<int> _particle_ids;
 		std::vector<int> _cell_offsets;
+		std::vector<int> _cell_counts;
 };
