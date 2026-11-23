@@ -1,4 +1,4 @@
-truct World{
+struct World{
 	// World dimensions
  	static constexpr float SIZE =  2.0f;  //x and y axis stretch from -1 to 1
 	static constexpr float MIN  = -1.0f; 
